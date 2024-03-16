@@ -5,7 +5,7 @@
 
 .global _start
 
-start:
+_start:
     LDR R0, =LOC     // pseudo-inst.
     MOV R1, #1       // write 1 to register 1
     MOV R2, #2       // write 2 to register 2
@@ -39,7 +39,7 @@ LOC:
 
 .global _start
 
-start:
+_start:
     LDR R0, =LOC     // pseudo-inst.
     MOV R1, #1       // write 1 to register 1
     MOV R2, #2       // write 2 to register 2
@@ -73,7 +73,7 @@ LOC:
 // Pre-indexed with write-back addressing mode
 .global _start
 
-start:
+_start:
     LDR R0, =LOC     // pseudo-inst.
     MOV R1, #1       // write 1 to register 1
     MOV R2, #2       // write 2 to register 2
@@ -105,7 +105,7 @@ LOC:
 /* Program for word swap */
 .global start
 
-start:
+_start:
     // Use register addressing or pre-indexed addressing modes
     LDR R0, =LOCA // pseudo-inst.
     LDR R1, [R0]
@@ -142,7 +142,7 @@ LOCB:
 /* Program for byte swap */
 .global start
 
-start:
+_start:
     LDR R0, =LOC     // pseudo-inst.
     LDRB R1, [R0]    // Load the first byte
     LDRB R2, [R0, #1]// Load the second byte
