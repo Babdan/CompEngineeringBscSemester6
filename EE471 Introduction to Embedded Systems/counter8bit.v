@@ -1,15 +1,28 @@
-module counter8bit(input clk, input reset, input stop, output reg [7:0] count);
-    // Inputs: clk (clock), reset (asynchronous reset), stop (to pause counting)
-    // Output: count (8-bit counter value)
+module counter8bit (
+    input clk,
+    input load,
+    input reset,
+    input enable,
+    input [7:0] data_in,
+    output reg [7:0] count
+);
 
-    always @(posedge clk or negedge reset) begin
-        if (~reset) begin
-            count <= 8'b0;  // Reset the count value to 0
-        end else begin
-            if (stop)
-                count <= count;  // Hold the count value if stop is asserted
-            else
-                count <= count + 1;  // Increment count on each positive clock edge
-        end
-    end
+// Declare internal signals
+reg [7:0] preload_value;
+
+always @ (posedge clk) begin
+    // Reset the counter if the reset signal is asserted
+    if (reset)
+        count <= 8'b0;
+    // Load the value on data input when load signal is 1
+    else if (load)
+        count <= data_in;
+    // Count up when enable signal is 1
+    else if (enable)
+        count <= count + 1;
+    // Wrap-around when count reaches 255
+    if (count == 8'b11111111)
+        count <= 8'b0;
+end
+
 endmodule
