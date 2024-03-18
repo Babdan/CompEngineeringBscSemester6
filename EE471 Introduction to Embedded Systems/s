@@ -1,0 +1,24 @@
+module counter_display(
+    input wire clock,
+    input wire reset,
+    output reg [6:0] HEX0
+);
+
+reg [3:0] count;
+
+// 4-bit to 7-segment decoder
+seg_decoder_fourbit decoder(.SW(count), .HEX0(HEX0));
+
+always @(posedge clock or posedge reset) begin
+    if (reset) begin
+        count <= 4'b0100; // Initialize counter to 4
+    end else begin
+        if (count == 4'b1110) begin
+            count <= 4'b0100; // Reset counter to 4 when it reaches 14
+        end else begin
+            count <= count + 1; // Increment counter
+        end
+    end
+end
+
+endmodule
