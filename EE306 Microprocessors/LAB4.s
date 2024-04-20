@@ -1,6 +1,5 @@
-//Part ONE
+// PART ONE
 //LAB4 BY: BOGDAN DORANTES, ONUR KELES, OMER MERT YILDIZ
-
 .global start
 start:
 	// search the list and find the index of the item
@@ -87,7 +86,7 @@ LDR R4, [R0], #4         // Get the price of i'th unit. Go to the (i + 1)'th ite
     CMP R4, #0		         // If current item is 0, it means last item was the last choice in Shopping List.
     BEQ done          // Stop looking process, and jump to the end.
     LSL R4, R4, #8           //
-	LSR R4, R4, #8
+    LSR R4, R4, #8
     
     CMP R4, R1               // Check if the wallet has enough budget the buy the current item.
     BLE buy_item_link             // If so, jump to the buy_item.
@@ -111,8 +110,13 @@ budget:
 	.word 0x100    
 .end
 
+
+
+----------
 // PART TWO - Shopping List
 //LAB4 BY: BOGDAN DORANTES, ONUR KELES, OMER MERT YILDIZ
+//Didn't use "SearchItem" because I don't know what it exactly
+
 .text
 .global main
 
@@ -123,47 +127,56 @@ main:
 	LDR R8,=MENU
 	LDR R9,=INDEX
     MOV R2, #0		     // Initilazing a Counter register
- Loop: 
+ LoopA: 
 	BL Subroutine
 	LDR R10, [R8, R5, LSL #2]
 	LSL R10, R10, #16           //
 	LSR R10, R10, #16
 	CMP R10, R1               // Check if the wallet has enough budget the buy the current item.
     ADDLE R2, R2, #1           // Increase the count by one.
-    SUBLE R1, R1, R4           // Subtract the amount of the item from our wallet.
+    SUBLE R1, R1, R10           // Subtract the amount of the item from our wallet.
     ADDLE R0, R0, #4
-	BLE Loop
-    BGT done          // else, jump to the end.
-buy_item:
-    BX LR            // Jump back to the search_loop.
+	BLE LoopA
+    BGT end          // else, jump to the end.
+	
+
+
 
 Subroutine: LDR R3, [R0] // the item you are looking for.
 	MOV R5, #0
-	STR R5, [R10] // initial assumption, item is not in the list.
-Loop: ADD R5,R5,#1
+	STR R5, [R9] // initial assumption, item is not in the list.
+	LDR R4, [R8] // number of items in the menu. R8's first value gives us the count
+Loop: ADD R5,R5, #1
 	CMP R5,R4		//If the basket is empty
 	BGT Done		//If the item is greater the count of item, jump to done
-	LDR R6, [R1, R5, LSL #2]// read item i.
+	LDR R6, [R8, R5, LSL #2]// read item i.
+	
+	LSR R6, R6, #16           //
+	LSL R6, R6, #16
+	
 	CMP R6, R3 		//(1.2)IF the item is found: 
-	STREQ R5, [R10] 	//Condition to store i? If the R5 and R2 are equal, i will be saved.
+	STREQ R5, [R11] 	//Condition to store i? If the R5 and R2 are equal, i will be saved.
 	BEQ Done 		//(1.2)THEN break the loop for unnecessary looping
 	B Loop 			//(1.2)ELSE keep looking
+
 Done: BX LR
 
 
-done:
-	//MOV LR, #0x14
-	BX LR
 
 exit:
  B end
 end: B end
 
 
-MENU: .word 0x4, 0xABCD0018, 0xAABB0048, 0xF00D0032, 0xBBCC0025
+MENU: .word 0x4, 0xABCD0018, 0xAABB0148, 0xF00D0032, 0xBBCC0025
+
 shopping_list: .word 0xF00D0000, 0xAABB0000, 0xABCD0000, 0xAABB0000, 0xF00D0000, 0xBBCC0000   //The Shopping List
 										       //The price can only be in last 2 digits
 // Budget the user have in their wallet.
 budget: 
-	.word 0x100    
+	.word 0x100
+INDEX: .word 0
 .end
+
+
+
