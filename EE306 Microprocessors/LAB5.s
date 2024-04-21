@@ -84,9 +84,60 @@ delay_loop:
     BX LR                   @ Return from delay function
 
 ////----------------+++++<PART THREE>+++++----------------
-Part III ou will be given a number between 1000 and 9999. Save this number to a memory location called
-TESTWORD using .word directive. Write an assembly program that reads that number from the memory
-location and displays it on 4-digit 7-segment display. You can use the division subroutin (de1soc)
+.data
+HEXTABLE:
+    .word 0b00111111  @ 0
+    .word 0b00000110  @ 1
+    .word 0b01011011  @ 2
+    .word 0b01001111  @ 3
+    .word 0b01100110  @ 4
+    .word 0b01101101  @ 5
+    .word 0b01111101  @ 6
+    .word 0b00000111  @ 7
+    .word 0b01111111  @ 8
+    .word 0b01101111  @ 9
+TESTWORD:
+    .word 0x4321       @ Test word to be displayed +REVERSED ORDER+
+
+.text
+.global _start
+
+_start:
+    LDR R1, =HEXTABLE       @ Load address of HEXTABLE into R1
+    LDR R2, =0xFF200020     @ Load address of seven-segment display register into R2
+    LDR R10, =TESTWORD      @ Load address of TESTWORD
+    LDR R10, [R10]          @ Load the actual number from TESTWORD
+
+    @ Extract digits
+    MOV R0, R10, LSR #12    @ Get thousands digit
+    AND R0, R0, #0x000F     @ Mask out the lower 4 bits
+    MOV R3, R10, LSR #8     @ Get hundreds digit
+    AND R3, R3, #0x000F     @ Mask out the lower 4 bits
+    MOV R4, R10, LSR #4     @ Get tens digit
+    AND R4, R4, #0x000F     @ Mask out the lower 4 bits
+    AND R5, R10, #0x000F    @ Get units digit
+
+    @ Display the digits
+    LSL R6, R0, #2
+    LDR R6, [R1, R6]
+    LSL R7, R3, #2
+    LDR R7, [R1, R7]
+    LSL R8, R4, #2
+    LDR R8, [R1, R8]
+    LSL R9, R5, #2
+    LDR R9, [R1, R9]
+
+    @ Combine digits into one register
+    ORR R12, R6, R7, LSL #8
+    ORR R12, R12, R8, LSL #16
+    ORR R12, R12, R9, LSL #24
+
+    STR R12, [R2]           @ Output the result to the 7-segment display register
+
+    B end_loop              @ Jump directly to end loop
+
+end_loop:
+    B end_loop              @ Stay here indefinitely
 
 //----------------+++++<PART FOUR>+++++----------------
 .data
