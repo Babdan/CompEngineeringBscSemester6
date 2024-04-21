@@ -1,5 +1,5 @@
 //LAB5 BY: BOGDAN ITSAM DORANTES-NIKOLAEV, ONUR KELES, OMER MERT YILDIZ
-//PART ONE
+//----------------+++++PART ONE+++++----------------
 .data
 HEXTABLE:
     .word 0b00111111  @ 0
@@ -37,7 +37,7 @@ display_on_7_segment:
     
     B read_switches         @ Repeat the process
 	
-//PART TWO
+//----------------+++++PART TWO+++++----------------
 .data
 HEXTABLE:
     .word 0b00111111  @ 0
@@ -83,12 +83,12 @@ delay_loop:
 
     BX LR                   @ Return from delay function
 
-//PART THREE
+////----------------+++++PART THREE+++++----------------
 Part III ou will be given a number between 1000 and 9999. Save this number to a memory location called
 TESTWORD using .word directive. Write an assembly program that reads that number from the memory
 location and displays it on 4-digit 7-segment display. You can use the division subroutin (de1soc)
 
-//PART FOUR
+//----------------+++++PART FOUR+++++----------------
 .data
 HEXTABLE:
     .word 0b00111111  @ 0
