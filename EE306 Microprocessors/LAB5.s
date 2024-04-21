@@ -97,7 +97,7 @@ HEXTABLE:
     .word 0b01111111  @ 8
     .word 0b01101111  @ 9
 TESTWORD:
-    .word 0x4321       @ Test word to be displayed +REVERSED ORDER+
+    .word 0x0000      @ Test word to be displayed
 
 .text
 .global _start
@@ -109,28 +109,28 @@ _start:
     LDR R10, [R10]          @ Load the actual number from TESTWORD
 
     @ Extract digits
-    MOV R0, R10, LSR #12    @ Get thousands digit
-    AND R0, R0, #0x000F     @ Mask out the lower 4 bits
-    MOV R3, R10, LSR #8     @ Get hundreds digit
-    AND R3, R3, #0x000F     @ Mask out the lower 4 bits
-    MOV R4, R10, LSR #4     @ Get tens digit
+    MOV R5, R10, LSR #12    @ Get thousands digit
+    AND R5, R5, #0x000F     @ Mask out the lower 4 bits
+    MOV R4, R10, LSR #8     @ Get hundreds digit
     AND R4, R4, #0x000F     @ Mask out the lower 4 bits
-    AND R5, R10, #0x000F    @ Get units digit
+    MOV R3, R10, LSR #4     @ Get tens digit
+    AND R3, R3, #0x000F     @ Mask out the lower 4 bits
+    AND R0, R10, #0x000F    @ Get units digit
 
     @ Display the digits
-    LSL R6, R0, #2
+    LSL R6, R5, #2
     LDR R6, [R1, R6]
-    LSL R7, R3, #2
+    LSL R7, R4, #2
     LDR R7, [R1, R7]
-    LSL R8, R4, #2
+    LSL R8, R3, #2
     LDR R8, [R1, R8]
-    LSL R9, R5, #2
+    LSL R9, R0, #2
     LDR R9, [R1, R9]
 
     @ Combine digits into one register
-    ORR R12, R6, R7, LSL #8
-    ORR R12, R12, R8, LSL #16
-    ORR R12, R12, R9, LSL #24
+    ORR R12, R9, R8, LSL #8
+    ORR R12, R12, R7, LSL #16
+    ORR R12, R12, R6, LSL #24
 
     STR R12, [R2]           @ Output the result to the 7-segment display register
 
@@ -138,7 +138,7 @@ _start:
 
 end_loop:
     B end_loop              @ Stay here indefinitely
-
+    
 //----------------+++++<PART FOUR>+++++----------------
 .data
 HEXTABLE:
