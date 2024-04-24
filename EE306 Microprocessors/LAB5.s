@@ -33,7 +33,6 @@ sub_loop_off:
     B _start                     @ Loop back to the start
 
 //-------------------------VARIANT "B"
-
 .text
 .global _start
 
