@@ -114,4 +114,41 @@ wait0_25sec_off:
     B loop
 
 //----------------+++++<PART THREE>+++++----------------
+.text
+.global _start
 
+.equ LED_BASE, 0xFF200000       @ Base address for the LEDs
+.equ KEY_BASE, 0xFF200050       @ Base address for the KEYs (Edgecapture register)
+
+_start:
+    LDR R0, =LED_BASE            @ Load LED base address
+    LDR R1, =KEY_BASE            @ Load KEY base address
+
+    @ Initialize LED state: turn on the rightmost LED
+    MOV R2, #0x01                @ Rightmost LED pattern
+    STR R2, [R0]
+
+loop:
+    @ Poll the Edgecapture register to detect button press
+    LDR R3, [R1]
+    ANDS R3, R3, #0x01           @ Check if KEY0 (the first bit) is pressed
+    BEQ loop                     @ If not pressed, continue polling
+
+    @ Clear the Edgecapture register by writing 0b1111
+    MOV R4, #0x0F
+    STR R4, [R1]
+
+    @ Shift the LED pattern to the left
+    LSL R2, R2, #1               @ Shift left operation on LED pattern
+    CMP R2, #0x00                @ Compare if the pattern is 0 (all LEDs are off)
+    MOVEQ R2, #0x01              @ If pattern is 0, reset to rightmost LED
+    STR R2, [R0]                 @ Update LEDs
+
+    @ Debounce delay (simple delay loop for demonstration)
+    LDR R5, =300000
+debounce:
+    SUBS R5, R5, #1              @ Decrement delay counter
+    BNE debounce                 @ Continue delay loop until counter is 0
+
+    @ Return to polling loop
+    B loop
