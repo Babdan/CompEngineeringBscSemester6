@@ -64,3 +64,53 @@ sub_loop_off:
     B loop                 @ Repeat the main loop
     
 //----------------+++++<PART TWO>+++++----------------
+.text
+.global _start
+
+.equ LED_BASE, 0xFF200000  
+.equ TIMER_BASE, 0xFFFEC600
+
+_start:
+    LDR R0, =LED_BASE            @ Load LED base address
+    LDR R2, =TIMER_BASE          @ Load Timer base address
+
+    @ Set the timer for a 0.25 second interval (50,000,000 counts at 200 MHz)
+    LDR R3, =50000000            @ Load the correct delay count into R3
+    STR R3, [R2]                 @ Store this value in the Load register
+
+    @ Set up the control register: enable timer and auto-reload
+    MOV R3, #0b011               @ 0b011 = Enable + Auto-reload
+    STR R3, [R2, #8]             @ Store this in the Control register
+
+loop:
+    @ Turn on LED
+    MOV R1, #1
+    STR R1, [R0]
+
+    @ Wait for timer interrupt flag
+wait0_25sec:
+    LDR R3, [R2, #12]            @ Read the Interrupt status register
+    ANDS R3, R3, #1              @ Check the F bit
+    BEQ wait0_25sec                 @ If F bit is not set, keep waiting
+
+    @ Reset timer interrupt flag by writing 1 to the F bit
+    MOV R3, #1
+    STR R3, [R2, #12]
+
+    @ Turn off LED
+    MOV R1, #0
+    STR R1, [R0]
+
+    @ Wait for timer again (redundant due to auto-reload but good for clarity)
+wait0_25sec_off:
+    LDR R3, [R2, #12]
+    ANDS R3, R3, #1
+    BEQ wait0_25sec_off
+
+    MOV R3, #1
+    STR R3, [R2, #12]
+
+    @ Loop back
+    B loop
+
+//----------------+++++<PART THREE>+++++----------------
