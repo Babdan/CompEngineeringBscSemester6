@@ -8,11 +8,11 @@ _start:
     LDR R2, =0xFF200020         // Base address for HEX displays
     LDR R3, =0xFFFEC600         // Base address for private timer
     LDR R6, =dice_sides_array   // Base address of sides array
-    LDR R5, =2000000			//
+    LDR R5, =2000000		//
     
 	BL display_start
 	
-	STR R5, [R3]                // Store the timer's value to the timer
+	STR R5, [R3]            // Store the timer's value to the timer
     MOV R7, #0x0003
     STR R7, [R3, #8]            // Activate auto reload and enable
 
@@ -38,23 +38,23 @@ button_pressed:
 
     // Now we know exactly one switch is pressed, we continue
     BL which_switch
-	BL random_number              // Get the random number and save it to R4
+	BL random_number        // Get the random number and save it to R4
     BL delay_result
 	B display_result
 
 display_start:
-	LDR R5, =0x50DEEE			        // Load "rdY" patterm for HEX displays
-	STR R5, [R2]				          // Displaying "rdY" pattern
+	LDR R5, =0x50DEEE	// Load "rdY" pattern for HEX displays
+	STR R5, [R2]		// Displaying "rdY" pattern
 	BX LR
 
 display_error:
     LDR R5, =0x7950             // Load "Er" pattern for HEX displays
-    STR R5, [R2]			        	// Displaying "ER" pattern
+    STR R5, [R2]		// Displaying "ER" pattern
     B loop
 
 display_SL:
     LDR R5, =0x6D38             // Load "SL" pattern for HEX displays
-    STR R5, [R2]				        // Displaying "SL" pattern
+    STR R5, [R2]		// Displaying "SL" pattern
     B loop
 
 display_result:
@@ -62,7 +62,7 @@ display_result:
 
     // Check if the number is a single digit or two digits
     CMP R10, #10
-    BGE display_two_digits	  	// Seperate function to display more than one digit
+    BGE display_two_digits	// Seperate function to display more than one digit
 
     // Single Digit Display
     LDR R5, [R11, R10, LSL #2]  // Load corresponding 7-segment code
@@ -77,35 +77,35 @@ display_two_digits:
 	MOV R5, #1
 	loopDigits: SUB R10, R10, #10		
 	CMP R10, #10
-	ADDGE R5 ,R5, #1			      // If the random number is 20, 30 etc. R5++
+	ADDGE R5 ,R5, #1		// If the random number is 20, 30 etc. R5++
 	BGE loopDigits
 	
 	LDR R7, [R11, R10, LSL #2]	// Load corresponding 7-segment code
 	
-	MOV R12, R5					//this is the second digit
+	MOV R12, R5			//this is the second digit
 	LDR R6, [R11, R12, LSL #2]	// Load corresponding 7-segment code
-	LSL R6, R6, #8			      	//
+	LSL R6, R6, #8			//
 	
-	ORR R6, R7, R6			      	//
-	STR R6, [R2]			        	//
+	ORR R6, R7, R6			//
+	STR R6, [R2]			//
 	
 	//AND R12, R10, #0x9 //0b1001 DEBUGGING PURPOSES ONLY!
-	POP {R2, R6, R7}		      	//
+	POP {R2, R6, R7}		//
 	B loop
 
 delay_result:
-	LDR R5, =0x080808		      	// Load the display-loading pattern
-	STR R5, [R2]				        // Display loading pattern on HEX Displays
+	LDR R5, =0x080808		// Load the display-loading pattern
+	STR R5, [R2]			// Display loading pattern on HEX Displays
 	
-	LDR R5, =0x00300000		    	// delay counter
+	LDR R5, =0x00300000		// delay counter
 	wait_loop: SUBS R5, R5, #1	//
-	BNE wait_loop				        //
+	BNE wait_loop			//
 	BX LR
 	
 
 
-count_bits:				        		// Brian Kernighan's Algorithm to count bits
-    MOV R8, #0				      	// R8 will store the count of bits
+count_bits:				// Brian Kernighan's Algorithm to count bits
+    MOV R8, #0				// R8 will store the count of bits
 	
 count_loop:
     CMP R9, #0
